@@ -8,10 +8,6 @@ class Profile(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)
     username = models.CharField(max_length=30)
 
-    def __str__(self):
-        return self.username
-
-
 
 class Page(models.Model):
     """
@@ -48,6 +44,3 @@ class Posts(models.Model):
     PostType = models.TextChoices('PostType', 'VIDEO ALBUM IMAGE')
     type = models.CharField(choices=PostType.choices, max_length=10)
     date = models.DateTimeField(null=True) 
-
-    def __str__(self):
-        return self.type
