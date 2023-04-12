@@ -3,6 +3,30 @@ from page.models import Profile, Page, Posts
 from rest_framework.renderers import JSONRenderer
 
 
+class DynamicFieldsModelSerializer(serializers.ModelSerializer):
+    """
+    A ModelSerializer that takes an additional `fields` argument that
+    controls which fields should be displayed.
+    """
+
+    def __init__(self, *args, **kwargs):
+        # Don't pass the 'fields' arg up to the superclass
+        fields = kwargs.pop('fields', None)
+
+        # Instantiate the superclass normally
+        super().__init__(*args, **kwargs)
+
+        if fields is not None:
+            # Drop any fields that are not specified in the `fields` argument.
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
+
+
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     """
     Serializer to deal with json data representation of Profile's model objects
@@ -10,18 +34,57 @@ class ProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profile
+        fields = ('username',)
+
+
+
+
+
+class PagePublicSerializer(serializers.ModelSerializer):
+    """
+    Serializer to display only page's public data
+    """
+    user = ProfileSerializer
+
+    class Meta:
+        model = Page
+        fields = ['date', 'user', 'pageId', 'followers']
+
+
+
+class PostPublicSerializer(serializers.ModelSerializer):
+    """
+    Serializer to display only posts public data
+    """
+    user = ProfileSerializer
+
+    class Meta:
+        model = Posts
+        fields = ['user', 'mediaId', 'type', 'likes', 'plays']
+
+
+
+
+
+class PageSerializer(serializers.DynamicFieldsModelSerializer):
+    """
+    Serializer to dinamiclly display private page fields based on the user request paramns
+    """
+    user = ProfileSerializer()
+
+    class Meta:
+        model = Page
         fields = '__all__'
 
-class PageSerializer(serializers.ModelSerializer):
-    """
-    Serializer to deal with json data representation of Page's model objects
-    """
-    pass
 
 
-class PostSerializer(serializers.ModelSerializer):
+class PostSerializer(serializers.DynamicFieldsModelSerializer):
     """
-    Serializer to deal with json data representation of Posts's model objects
+    Serializer to dinamiclly display private post's fields based on the user request params
     """
-    pass
+    user = ProfileSerializer()
+
+    class Meta:
+        model = Posts
+        fields = '__all__'
 
