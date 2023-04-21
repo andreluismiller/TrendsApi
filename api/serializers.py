@@ -68,7 +68,7 @@ class PostPublicSerializer(serializers.ModelSerializer):
 
 class PageSerializer(serializers.DynamicFieldsModelSerializer):
     """
-    Serializer to dinamiclly display private page fields based on the user request paramns
+    Serializer to dinamiclly display private page's fields based on the user request paramns
     """
     user = ProfileSerializer()
 
