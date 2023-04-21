@@ -3,6 +3,19 @@ from page.models import Profile, Page, Posts
 from rest_framework.renderers import JSONRenderer
 
 
+
+from django.contrib.auth.models import User
+
+class UserSerializer(serializers.ModelSerializer):
+    snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Page.objects.all())
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'page']
+
+
+
+
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """
     A ModelSerializer that takes an additional `fields` argument that
